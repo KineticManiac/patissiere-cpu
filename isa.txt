@@ -1,0 +1,99 @@
+A-type  : IISS SSFF FFDD DDFF (10xx xxxx xxxx xxxx)
+I-type  : IIII IIFF FFDD DDFF (5432 10xx xxxx xxxx)
+R-type  : FFSS SSFF FFDD DDFF (xxxx xxxx xxxx xxxx)
+J-type  : IIII IIII FFFF IIFF (9432 1065 xxxx 87xx)
+PI-type : IIII IIPP FFDD DDFF (7654 32xx xxxx xxxx) (The immediate type is I-type, shifted left by 2)
+PR-type : FFSS SSPP FFDD DDFF (xxxx xxxx xxxx xxxx)
+E-type  : FIII FFII FFRR RIFF (x432 xx65 xxxx x7xx) (R: an identifier for a preset list of registers)
+
+bit 4 -> 0, Z
+bits 6:5 -> 0, O^S, O, C
+bit 7 -> ~?
+JAL         -> IIII IIII 0000 II01 special case
+J           -> IIII IIII 1000 II01 ~(0 | 0)
+JEQ         -> IIII IIII 0001 II01  (0 | Z)
+JNE         -> IIII IIII 1001 II01 ~(0 | Z)
+JLT         -> IIII IIII 0010 II01  (O^S | 0)
+JGE         -> IIII IIII 1010 II01 ~(O^S | 0)
+JLTU        -> IIII IIII 0110 II01  (C | 0)
+JGEU        -> IIII IIII 1110 II01 ~(C | 0)
+JLE         -> IIII IIII 0011 II01  (O^S | Z)
+JGT         -> IIII IIII 1011 II01 ~(O^S | Z)
+JLEU        -> IIII IIII 0111 II01  (C | Z)
+JGTU        -> IIII IIII 1111 II01 ~(C | Z)
+JO          -> IIII IIII 0100 II01  (O | 0)
+JNO         -> IIII IIII 1100 II01 ~(O | 0)
+JS          -> IIII IIII 0101 II01  (S) - special case
+JNS         -> IIII IIII 1101 II01 ~(S) - special case
+
+CMP         -> 00SS SS00 00DD DD00
+JR          -> 1000 0000 00DD DD00
+AND         -> 00SS SS00 01DD DD00
+ANDN        -> 10SS SS00 01DD DD00
+OR          -> 00SS SS00 10DD DD00
+ORN         -> 10SS SS00 10DD DD00
+XOR         -> 00SS SS00 11DD DD00
+XNOR        -> 10SS SS00 11DD DD00
+SHnADD      -> IISS SS01 10DD DD00
+SUB         -> 10SS SS01 11DD DD00
+ROL         -> 00SS SS10 00DD DD00
+ROR         -> 00SS SS10 01DD DD00
+ZEXTB       -> 11SS SS10 10DD DD00
+ZEXTH       -> 01SS SS10 10DD DD00
+SEXTB       -> 11SS SS10 11DD DD00
+SEXTH       -> 01SS SS10 11DD DD00
+LDB         -> 11SS SS01 00DD DD00
+LDH         -> 01SS SS01 00DD DD00
+LDW         -> 00SS SS01 00DD DD00
+STB         -> 11SS SS01 01DD DD00
+STH         -> 01SS SS01 01DD DD00
+STW         -> 00SS SS01 01DD DD00
+
+bit 6 -> 0, Z
+bits 15:14 -> 0, O^S, O, C
+bit 7 -> ~?
+TEST        -> 00SS SS11 00DD DD00 (0 | 0)
+MOV         -> 00SS SS11 10DD DD00 ~(0 | 0)
+MOVEQ       -> 00SS SS11 01DD DD00 (0 | Z)
+MOVNE       -> 00SS SS11 11DD DD00 ~(0 | Z)
+MOVLT       -> 01SS SS11 00DD DD00 (O^S | 0)
+MOVGE       -> 01SS SS11 10DD DD00 ~(O^S | 0)
+MOVLE       -> 01SS SS11 01DD DD00 (O^S | Z)
+MOVGT       -> 01SS SS11 11DD DD00 ~(O^S | Z)
+MOVO        -> 10SS SS11 00DD DD00 (O | 0)
+MOVNO       -> 10SS SS11 10DD DD00 ~(O | 0)
+MOVS        -> 10SS SS11 01DD DD00 (S) - special case
+MOVNS       -> 10SS SS11 11DD DD00 ~(S) - special case
+MOVLTU      -> 11SS SS11 00DD DD00 (C | 0)
+MOVGEU      -> 11SS SS11 10DD DD00 ~(C | 0)
+MOVLEU      -> 11SS SS11 01DD DD00 (C | Z)
+MOVGTU      -> 11SS SS11 11DD DD00 ~(C | Z)
+
+CMP.I       -> IIII II00 00DD DD10
+AND.I       -> IIII II00 01DD DD10
+OR.I        -> IIII II00 10DD DD10
+XOR.I       -> IIII II00 11DD DD10
+ADD.I       -> IIII II01 10DD DD10
+SLL         -> II00 0001 11DD DD10
+SRL         -> II00 0101 11DD DD10
+SRA         -> II00 1101 11DD DD10
+ROL.I       -> IIII II10 00DD DD10
+ROR.I       -> IIII II10 01DD DD10
+STPIO       -> IIII II10 10DD DD10
+LDPIO       -> IIII II10 11DD DD10
+TEST.I      -> IIII II11 00DD DD10
+MOV.I       -> IIII II11 10DD DD10
+MOVEQ.I     -> IIII II11 01DD DD10
+MOVNE.I     -> IIII II11 11DD DD10
+
+ENTERL      -> 1III 00II 01RR RI11
+ENTER       -> 1III 01II 01RR RI11
+EXITL       -> 0III 00II 01RR RI11
+EXIT        -> 0III 01II 01RR RI11
+
+LDW.P       -> 00SS SSPP 11DD DD11
+LDPTR       -> 0100 00PP 11DD DD11
+STW.P       -> 10SS SSPP 11DD DD11
+STPTR       -> 1100 00PP 11DD DD11
+LDW.PI      -> IIII IIPP 10DD DD11
+STW.PI      -> IIII IIPP 00DD DD11
