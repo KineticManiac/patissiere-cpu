@@ -1,0 +1,8 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,64)
+  { TextEdit1 TextEdit
+    MoveScaled(1,2,62,61)
+  }
+}

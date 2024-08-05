@@ -1,0 +1,157 @@
+' Gambas module file
+
+Private OPCODES As String[] = [
+  "JAL",
+  "J",
+  "JEQ",
+  "JNE",
+  "JLT",
+  "JGE",
+  "JLTU",
+  "JGEU",
+  "JLE",
+  "JGT",
+  "JLEU",
+  "JGTU",
+  "JO",
+  "JNO",
+  "JS",
+  "JNS",
+  "CMP",
+  "JR",
+  "AND",
+  "ANDN",
+  "OR",
+  "ORN",
+  "XOR",
+  "XNOR",
+  "ADD",
+  "SH1ADD",
+  "SH2ADD",
+  "SH3ADD",
+  "SUB",
+  "ROL",
+  "ROR",
+  "ZEXTB",
+  "ZEXTH",
+  "SEXTB",
+  "SEXTH",
+  "LDB",
+  "LDH", 
+  "LDW", 
+  "STB", 
+  "STH", 
+  "STW",
+  "TEST",
+  "MOV",
+  "MOVEQ",
+  "MOVNE",
+  "MOVLT",
+  "MOVGE",
+  "MOVLE",
+  "MOVGT",
+  "MOVO",
+  "MOVNO",
+  "MOVS",
+  "MOVNS",
+  "MOVLTU",
+  "MOVGEU",
+  "MOVLEU",
+  "MOVGTU",
+  "SH1",
+  "SH2",
+  "SH3",
+  "SRL",
+  "SRA",
+  "OUT",
+  "IN",
+  "ENTER",
+  "ENTERL",
+  "EXIT",
+  "EXITL",
+  "NOP"
+]
+
+Private REGISTERS As String[] = [
+  "R0",
+  "R1",
+  "R2",
+  "R3",
+  "R4",
+  "R5",
+  "R6",
+  "R7",
+  "R8",
+  "R9",
+  "R10",
+  "R11",
+  "R12",
+  "R13",
+  "R14",
+  "R15",
+  "SP",
+  "AP",
+  "BP",
+  "CP"
+]
+
+Private Const END_OF_LINE As String = "\r\n"
+Private Const WHITESPACE As String = " \t"
+Private Const OPERATORS As String = ",():"
+Private Const COMMENT_MARKERS As String = "#"
+Private Const NUMERIC_INITIALS As String = "0123456789"
+
+Public Function SyntaxColor(code As String) As String
+  
+  Dim lines As String[] = Split(code, END_OF_LINE)
+  Dim newCode As String = ""
+  
+  For i As Integer = 0 To lines.Length - 2
+    newCode &= SyntaxColorLine(lines[i]) & "<br>"
+  Next
+  newCode &= SyntaxColorLine(lines[lines.Length - 1])
+  
+  Return newCode
+End
+
+Const SPAN_OPCODE_BEGIN As String = "<span style='color:orange'><b>"
+Const SPAN_OPCODE_END As String = "</b></span>"
+Const SPAN_REGISTER_BEGIN As String = "<span style='color:lightblue'><b>"
+Const SPAN_REGISTER_END As String = "</b></span>"
+Const SPAN_COMMENT_BEGIN As String = "<span style='color:green'>"
+Const SPAN_COMMENT_END As String = "</span>"
+Const SPAN_NUMERIC_BEGIN As String = "<span style='color:yellow'>"
+Const SPAN_NUMERIC_END As String = "</span>"
+Const SPAN_OTHER_BEGIN As String = "<span style='color:white'>"
+Const SPAN_OTHER_END As String = "</span>"
+
+Private Function SyntaxColorLine(code As String) As String
+  
+  Dim result As String = ""
+  Dim word As String = ""
+  
+  For i As Integer = 0 To code.Len - 1
+    Dim c As String = code[i]
+    
+    If InStr(WHITESPACE, c) <> 0 Or If InStr(OPERATORS, c) <> 0 Then 
+      result &= SyntaxColorWord(word) & SPAN_OTHER_BEGIN & c & SPAN_OTHER_END
+      word = ""
+    Else If InStr(COMMENT_MARKERS, c) <> 0 Then 
+      result &= SyntaxColorWord(word) & SPAN_COMMENT_BEGIN & code[i, code.Len - i] & SPAN_COMMENT_END
+      Return result
+    Else 
+      word &= c
+    Endif
+  Next
+  Return result & SyntaxColorWord(word)
+End
+
+Private Function SyntaxColorWord(word As String) As String
+  
+  If Comp(word, "") = 0 Then Return ""
+  If Utility.StrInList(word, OPCODES, gb.IgnoreCase) <> -1 Then Return SPAN_OPCODE_BEGIN & word & SPAN_OPCODE_END
+  If Utility.StrInList(word, REGISTERS, gb.IgnoreCase) <> -1 Then Return SPAN_REGISTER_BEGIN & word & SPAN_REGISTER_END
+  If InStr(NUMERIC_INITIALS, word[0]) <> 0 Then Return SPAN_NUMERIC_BEGIN & word & SPAN_NUMERIC_END
+  Return SPAN_OTHER_BEGIN & word & SPAN_OTHER_END
+End
+

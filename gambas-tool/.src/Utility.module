@@ -1,0 +1,10 @@
+' Gambas module file
+
+Public Function StrInList(str As String, lst As String[], Optional mode As Integer = 0) As Integer
+  
+  For i As Integer = 0 To lst.Length - 1
+    If Comp(str, lst[i], mode) = 0 Then Return i
+  Next
+  
+  Return -1
+End

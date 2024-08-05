@@ -1,0 +1,26 @@
+' Gambas class file
+
+
+Public Sub Form_Open()
+
+End
+
+Public Sub TextEdit1_Change()
+  Static spurious As Boolean = False
+  If spurious Then 
+    spurious = False
+  Else 
+    Dim text As String = TextEdit1.Text
+    If Comp(text, "") = 0 Then Return 
+    
+    spurious = True
+    
+    Dim selStart As Integer = TextEdit1.Selection.Start
+    Dim selLen As Integer = TextEdit1.Selection.Length
+    
+    TextEdit1.RichText = Assembler.SyntaxColor(text)
+    
+    TextEdit1.Select(selStart, selLen)
+  Endif
+
+End
