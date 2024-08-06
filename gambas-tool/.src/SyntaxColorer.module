@@ -1,0 +1,56 @@
+' Gambas module file
+
+Const SPAN_OPCODE_BEGIN As String = "<span style='color:orange'><b>"
+Const SPAN_OPCODE_END As String = "</b></span>"
+Const SPAN_REGISTER_BEGIN As String = "<span style='color:lightblue'><b>"
+Const SPAN_REGISTER_END As String = "</b></span>"
+Const SPAN_COMMENT_BEGIN As String = "<span style='color:green'>"
+Const SPAN_COMMENT_END As String = "</span>"
+Const SPAN_NUMERIC_BEGIN As String = "<span style='color:yellow'>"
+Const SPAN_NUMERIC_END As String = "</span>"
+Const SPAN_OTHER_BEGIN As String = "<span style='color:white'>"
+Const SPAN_OTHER_END As String = "</span>"
+
+Public Function Color(code As String) As String
+  
+  Dim lines As String[] = Split(code, Keywords.END_OF_LINE)
+  Dim newCode As String = ""
+  
+  For i As Integer = 0 To lines.Length - 2
+    newCode &= ColorLine(lines[i]) & "<br>"
+  Next
+  newCode &= ColorLine(lines[lines.Length - 1])
+  
+  Return newCode
+End
+
+Private Function ColorLine(code As String) As String
+  
+  Dim result As String = ""
+  Dim word As String = ""
+  
+  For i As Integer = 0 To code.Len - 1
+    Dim c As String = code[i]
+    
+    If InStr(Keywords.WHITESPACE, c) <> 0 Or If InStr(Keywords.OPERATORS, c) <> 0 Then 
+      result &= ColorWord(word) & SPAN_OTHER_BEGIN & c & SPAN_OTHER_END
+      word = ""
+    Else If InStr(Keywords.COMMENT_MARKERS, c) <> 0 Then 
+      result &= ColorWord(word) & SPAN_COMMENT_BEGIN & code[i, code.Len - i] & SPAN_COMMENT_END
+      Return result
+    Else 
+      word &= c
+    Endif
+  Next
+  Return result & ColorWord(word)
+End
+
+Private Function ColorWord(word As String) As String
+  
+  If Comp(word, "") = 0 Then Return ""
+  If Utility.StrInList(word, Keywords.OPCODES, gb.IgnoreCase) <> -1 Then Return SPAN_OPCODE_BEGIN & word & SPAN_OPCODE_END
+  If Utility.StrInList(word, Keywords.REGISTERS, gb.IgnoreCase) <> -1 Then Return SPAN_REGISTER_BEGIN & word & SPAN_REGISTER_END
+  If InStr(Keywords.NUMERIC_INITIALS, word[0]) <> 0 Then Return SPAN_NUMERIC_BEGIN & word & SPAN_NUMERIC_END
+  Return SPAN_OTHER_BEGIN & word & SPAN_OTHER_END
+End
+

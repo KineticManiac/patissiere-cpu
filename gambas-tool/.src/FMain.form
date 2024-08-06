@@ -1,8 +1,19 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,64,64)
-  { TextEdit1 TextEdit
-    MoveScaled(1,2,62,61)
+  MoveScaled(0,0,105,63)
+  Arrangement = Arrange.Fill
+  Padding = 5
+  { Splitter1 Splitter
+    MoveScaled(1,2,65,28)
+    Expand = True
+    Spacing = True
+    { TextEdit1 TextEdit
+      MoveScaled(1,6,41,11)
+      Background = &H101030
+    }
+    { Panel1 Panel
+      MoveScaled(43,8,8,8)
+    }
   }
 }
