@@ -1,0 +1,114 @@
+' Gambas module file
+
+Private EscapeSequenceKeys As String[] = [
+  "n",
+  "r",
+  "t",
+  "b",
+  "v",
+  "f",
+  "e",
+  "'"
+  "\"",
+  "\\"
+]
+
+Private EscapeSequenceValues As String[] = [
+  "\n",
+  "\r",
+  "\t",
+  "\b",
+  "\v",
+  "\f",
+  "\e",
+  "'",
+  "\"",
+  "\\"
+]
+
+Public Function Tokenize(code As String) As Token[][]
+  
+  Dim lines As String[] = Split(code, Keywords.END_OF_LINE)
+  Dim result As Token[][] = []
+  Dim tokens As Token[]
+  
+  For i As Integer = 0 To lines.Length - 1
+    tokens = TokenizeLine(lines[i])
+    If tokens.Length > 0 Then result.Add(tokens)
+  Next
+  
+  Return result
+End
+
+Private Function TokenizeLine(code As String) As Token[]
+  
+  Dim tokens As Token[] = []
+  Dim word As String = ""
+  Dim escaping As Boolean = False
+  Dim in_string As Boolean = False
+  Dim string_marker As String
+  
+  For i As Integer = 0 To code.Len - 1
+    Dim c As String = code[i]
+    
+    If in_string Then 
+      If escaping Then
+        escaping = False
+      
+        Dim index As Integer = Utility.StrInList(c, EscapeSequenceKeys)
+        word &= EscapeSequenceValues[index]
+      Else If c = Keywords.STRING_ESCAPE_CHAR Then 
+        escaping = True
+      Else If c = string_marker Then 
+        in_string = False
+        
+        tokens.Add(Token.Build(word, Token.TYPE_STRING))
+        word = ""
+      Else 
+        word &= c
+      Endif
+    Else If InStr(Keywords.WHITESPACE, c) <> 0 Then 
+      If word <> "" Then 
+        tokens.Add(TokenizeWord(word))
+        word = ""
+      Endif
+    Else If InStr(Keywords.OPERATORS, c) <> 0 Then 
+      If word <> "" Then 
+        tokens.Add(TokenizeWord(word))
+        word = ""
+      Endif
+      
+      tokens.Add(Token.Build(c, Token.TYPE_OPERATOR))
+    Else If InStr(Keywords.COMMENT_MARKERS, c) <> 0 Then 
+      Return tokens
+    Else If InStr(Keywords.STRING_MARKERS, c) <> 0 Then 
+      in_string = True
+      string_marker = c
+      If word <> "" Then 
+        tokens.Add(TokenizeWord(word))
+        word = ""
+      Endif
+    Else 
+      word &= c
+    Endif
+  Next
+  
+  If in_string Then 
+    Error.Raise("The string must be closed before the line ends.")
+  Else If word <> "" Then
+    tokens.Add(TokenizeWord(word))
+  Endif
+  
+  Return tokens
+End
+
+Private Function TokenizeWord(word As String) As Token
+  
+  If word = "" Then Error.Raise("word cannot be empty")
+  If Utility.StrInList(word, Keywords.PREPDIRS, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_PREPDIR)
+  If Utility.StrInList(word, Keywords.OPCODES, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_OPCODE)
+  If Utility.StrInList(word, Keywords.REGISTERS, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_REGISTER)
+  If InStr(Keywords.NUMERIC_INITIALS, word[0]) <> 0 Then Return Token.Build(word, Token.TYPE_NUMERIC)
+  Return Token.Build(word, Token.TYPE_OTHER)
+End
+

@@ -1,5 +1,12 @@
 ' Gambas module file
 
+Public PREPDIRS As String[] = [
+  ".DEF",
+  ".BYTE",
+  ".HALF",
+  ".WORD"
+]
+
 Public OPCODES As String[] = [
   "JAL",
   "J",
@@ -63,8 +70,6 @@ Public OPCODES As String[] = [
   "SH3",
   "SRL",
   "SRA",
-  "OUT",
-  "IN",
   "ENTER",
   "ENTERL",
   "EXIT",
@@ -92,11 +97,14 @@ Public REGISTERS As String[] = [
   "SP",
   "AP",
   "BP",
-  "CP"
+  "CP",
+  "LR"
 ]
 
 Public Const END_OF_LINE As String = "\r\n"
 Public Const WHITESPACE As String = " \t"
-Public Const OPERATORS As String = ",():"
+Public Const OPERATORS As String = ",()[]-:"
+Public Const STRING_MARKERS As String = "'\""
+Public Const STRING_ESCAPE_CHAR As String = "\\"
 Public Const COMMENT_MARKERS As String = "#"
 Public Const NUMERIC_INITIALS As String = "0123456789"

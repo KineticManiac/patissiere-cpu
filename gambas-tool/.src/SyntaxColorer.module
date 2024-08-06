@@ -1,25 +1,40 @@
 ' Gambas module file
 
-Const SPAN_OPCODE_BEGIN As String = "<span style='color:orange'><b>"
-Const SPAN_OPCODE_END As String = "</b></span>"
-Const SPAN_REGISTER_BEGIN As String = "<span style='color:lightblue'><b>"
-Const SPAN_REGISTER_END As String = "</b></span>"
-Const SPAN_COMMENT_BEGIN As String = "<span style='color:green'>"
-Const SPAN_COMMENT_END As String = "</span>"
-Const SPAN_NUMERIC_BEGIN As String = "<span style='color:yellow'>"
-Const SPAN_NUMERIC_END As String = "</span>"
-Const SPAN_OTHER_BEGIN As String = "<span style='color:white'>"
-Const SPAN_OTHER_END As String = "</span>"
+Const FONT_PREPDIR_BEGIN As String = "<font style='color:#3cdfff'><b>"
+Const FONT_PREPDIR_END As String = "</b></font>"
+Const FONT_OPCODE_BEGIN As String = "<font style='color:orange'><b>"
+Const FONT_OPCODE_END As String = "</b></font>"
+Const FONT_REGISTER_BEGIN As String = "<font style='color:lightblue'><b>"
+Const FONT_REGISTER_END As String = "</b></font>"
+Const FONT_COMMENT_BEGIN As String = "<font style='color:green'>"
+Const FONT_COMMENT_END As String = "</font>"
+Const FONT_NUMERIC_BEGIN As String = "<font style='color:yellow'>"
+Const FONT_NUMERIC_END As String = "</font>"
+Const FONT_STRING_BEGIN As String = "<font style='color:pink'>"
+Const FONT_STRING_END As String = "</font>"
+Const FONT_ESCAPE_BEGIN As String = "<b>"
+Const FONT_ESCAPE_END As String = "</b>"
+Const FONT_OTHER_BEGIN As String = "<font style='color:white'>"
+Const FONT_OTHER_END As String = "</font>"
 
-Public Function Color(code As String) As String
+Public Function Color(code As String, Optional emphasizedLine As Integer = -1) As String
   
   Dim lines As String[] = Split(code, Keywords.END_OF_LINE)
   Dim newCode As String = ""
   
   For i As Integer = 0 To lines.Length - 2
-    newCode &= ColorLine(lines[i]) & "<br>"
+    If i = emphasizedLine Then 
+      newCode &= "<i>" & ColorLine(lines[i]) & "</i><br>"
+    Else 
+      newCode &= ColorLine(lines[i]) & "<br>"
+    Endif
   Next
-  newCode &= ColorLine(lines[lines.Length - 1])
+  
+  If lines.Length - 1 = emphasizedLine Then 
+    newCode &= "<i>" & ColorLine(lines[i]) & "</i><br>"
+  Else 
+    newCode &= ColorLine(lines[lines.Length - 1])
+  Endif
   
   Return newCode
 End
@@ -28,29 +43,62 @@ Private Function ColorLine(code As String) As String
   
   Dim result As String = ""
   Dim word As String = ""
+  Dim escaping As Boolean = False
+  Dim in_string As Boolean = False
+  Dim string_marker As String
   
   For i As Integer = 0 To code.Len - 1
     Dim c As String = code[i]
     
-    If InStr(Keywords.WHITESPACE, c) <> 0 Or If InStr(Keywords.OPERATORS, c) <> 0 Then 
-      result &= ColorWord(word) & SPAN_OTHER_BEGIN & c & SPAN_OTHER_END
+    If in_string Then 
+      If escaping Then
+        escaping = False
+        word &= FONT_ESCAPE_BEGIN & Keywords.STRING_ESCAPE_CHAR & c & FONT_ESCAPE_END
+      Else If c = Keywords.STRING_ESCAPE_CHAR Then 
+        escaping = True
+      Else If c = string_marker Then 
+        in_string = False
+        result &= FONT_STRING_BEGIN & c & word & c & FONT_STRING_END
+        word = ""
+      Else 
+        word &= c
+      Endif
+    Else If InStr(Keywords.WHITESPACE, c) <> 0 Or If InStr(Keywords.OPERATORS, c) <> 0 Then 
+      result &= ColorWord(word) & FONT_OTHER_BEGIN & c & FONT_OTHER_END
       word = ""
     Else If InStr(Keywords.COMMENT_MARKERS, c) <> 0 Then 
-      result &= ColorWord(word) & SPAN_COMMENT_BEGIN & code[i, code.Len - i] & SPAN_COMMENT_END
+      result &= ColorWord(word) & FONT_COMMENT_BEGIN & code[i, code.Len - i] & FONT_COMMENT_END
       Return result
+    Else If InStr(Keywords.STRING_MARKERS, c) <> 0 Then 
+      in_string = True
+      string_marker = c
+      result &= ColorWord(word)
+      word = ""
     Else 
       word &= c
     Endif
   Next
-  Return result & ColorWord(word)
+  
+  If in_string Then 
+    If escaping Then 
+      word &= FONT_ESCAPE_BEGIN & Keywords.STRING_ESCAPE_CHAR & FONT_ESCAPE_END
+    Endif
+    
+    result &= FONT_STRING_BEGIN & string_marker & word & FONT_STRING_END
+  Else 
+    result &= ColorWord(word)
+  Endif
+  
+  Return result
 End
 
 Private Function ColorWord(word As String) As String
   
-  If Comp(word, "") = 0 Then Return ""
-  If Utility.StrInList(word, Keywords.OPCODES, gb.IgnoreCase) <> -1 Then Return SPAN_OPCODE_BEGIN & word & SPAN_OPCODE_END
-  If Utility.StrInList(word, Keywords.REGISTERS, gb.IgnoreCase) <> -1 Then Return SPAN_REGISTER_BEGIN & word & SPAN_REGISTER_END
-  If InStr(Keywords.NUMERIC_INITIALS, word[0]) <> 0 Then Return SPAN_NUMERIC_BEGIN & word & SPAN_NUMERIC_END
-  Return SPAN_OTHER_BEGIN & word & SPAN_OTHER_END
+  If word = "" Then Return ""
+  If Utility.StrInList(word, Keywords.PREPDIRS, gb.IgnoreCase) <> -1 Then Return FONT_PREPDIR_BEGIN & word & FONT_PREPDIR_END
+  If Utility.StrInList(word, Keywords.OPCODES, gb.IgnoreCase) <> -1 Then Return FONT_OPCODE_BEGIN & word & FONT_OPCODE_END
+  If Utility.StrInList(word, Keywords.REGISTERS, gb.IgnoreCase) <> -1 Then Return FONT_REGISTER_BEGIN & word & FONT_REGISTER_END
+  If InStr(Keywords.NUMERIC_INITIALS, word[0]) <> 0 Then Return FONT_NUMERIC_BEGIN & word & FONT_NUMERIC_END
+  Return FONT_OTHER_BEGIN & word & FONT_OTHER_END
 End
 

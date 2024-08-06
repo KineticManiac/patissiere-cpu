@@ -1,22 +1,21 @@
 ' Gambas class file
 
-
-Public Sub TextEdit1_Change()
+Public Sub CodeEdit_Change()
   Static spurious As Boolean = False
   If spurious Then 
     spurious = False
   Else 
-    Dim text As String = TextEdit1.Text
+    Dim text As String = CodeEdit.Text
     If Comp(text, "") = 0 Then Return 
     
     spurious = True
     
-    Dim selStart As Integer = TextEdit1.Selection.Start
-    Dim selLen As Integer = TextEdit1.Selection.Length
+    Dim selStart As Integer = CodeEdit.Selection.Start
+    Dim selLen As Integer = CodeEdit.Selection.Length
     
-    TextEdit1.RichText = SyntaxColorer.Color(text)
+    CodeEdit.RichText = SyntaxColorer.Color(text)
     
-    TextEdit1.Select(selStart, selLen)
+    CodeEdit.Select(selStart, selLen)
   Endif
 
 End
@@ -25,15 +24,15 @@ Const MIN_FONT_SIZE As Float = 7.0
 Const MAX_FONT_SIZE As Float = 70.0
 Const ZOOM_SPEED As Float = 2.0
 
-Public Sub TextEdit1_MouseWheel()
+Public Sub CodeEdit_MouseWheel()
   
-  Dim size As Float = TextEdit1.Font.Size
+  Dim size As Float = CodeEdit.Font.Size
   If Mouse.Control Then
     size += Mouse.Delta * ZOOM_SPEED
     If size < MIN_FONT_SIZE Then size = MIN_FONT_SIZE
     If size > MAX_FONT_SIZE Then size = MAX_FONT_SIZE
     
-    TextEdit1.Font.Size = size
+    CodeEdit.Font.Size = size
     Stop Event
   Endif
   
@@ -42,6 +41,24 @@ End
 
 Public Sub Form_Open()
 
-  Splitter1.Layout = [70, 30]
+  MainSplitter.Layout = [70, 30]
+  
+End
+
+Public Sub Form_Resize()
+
+    EmulatorPanel.Layout = [EmulatorPanel.Height - 35, 35]
+
+End
+
+Public Sub ButtonRun_Click()
+
+  Dim tokens As Token[][] = Tokenizer.Tokenize(CodeEdit.Text)
+  For i As Integer = 0 To tokens.Length - 1
+    For j As Integer = 0 To tokens[i].Length - 1
+      Debug tokens[i][j].Type & "(" & tokens[i][j].Word & ")"
+    Next
+    Debug "\n"
+  Next
 
 End

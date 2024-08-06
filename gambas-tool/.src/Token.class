@@ -1,0 +1,20 @@
+' Gambas class file
+
+Public Enum TYPE_PREPDIR, TYPE_OPCODE, TYPE_REGISTER, TYPE_OPERATOR, TYPE_NUMERIC, TYPE_STRING, TYPE_OTHER
+
+Public Type As Integer
+Public Word As String
+
+Public Sub _new(_Word As String, _Type As Integer)
+  
+  Word = _Word
+  Type = _Type
+  
+End
+
+Static Public Function Build(_Word As String, _Type As Integer) As Token
+  
+  Return New Token(_Word, _Type)
+  
+End
+

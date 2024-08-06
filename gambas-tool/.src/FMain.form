@@ -4,16 +4,49 @@
   MoveScaled(0,0,105,63)
   Arrangement = Arrange.Fill
   Padding = 5
-  { Splitter1 Splitter
-    MoveScaled(1,2,65,28)
+  { MainSplitter Splitter
+    MoveScaled(1,2,103,60)
     Expand = True
     Spacing = True
-    { TextEdit1 TextEdit
+    { CodeEdit TextEdit
       MoveScaled(1,6,41,11)
+      Font = Font["Liberation Mono"]
       Background = &H101030
     }
-    { Panel1 Panel
-      MoveScaled(43,8,8,8)
+    { EmulatorPanel Splitter
+      MoveScaled(46,1,42,58)
+      Arrangement = Arrange.Vertical
+      Spacing = True
+      Border = False
+      { TabEmulator TabPanel
+        MoveScaled(2,5,38,45)
+        Count = 2
+        Index = 0
+        Text = ("Registers")
+        Index = 1
+        Text = ("Memory")
+        Index = 0
+      }
+      { HBox1 HBox
+        MoveScaled(1,52,27,5)
+        Centered = True
+        { ButtonRun Button
+          MoveScaled(1,1,5,5)
+          Picture = Picture["icon:/medium/play"]
+        }
+        { Button2 Button
+          MoveScaled(7,1,5,5)
+          Picture = Picture["icon:/medium/end"]
+        }
+        { Button3 Button
+          MoveScaled(13,1,5,5)
+          Picture = Picture["icon:/medium/pause"]
+        }
+        { Button4 Button
+          MoveScaled(19,1,5,5)
+          Picture = Picture["icon:/medium/stop"]
+        }
+      }
     }
   }
 }
