@@ -1,7 +1,8 @@
 ' Gambas module file
 
 Public DIRECTIVES As String[] = [
-  ".DEF",
+  ".ORG",
+  ".DEFINE",
   ".BYTE",
   ".HALF",
   ".WORD"

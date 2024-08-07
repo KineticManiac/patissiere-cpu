@@ -1,0 +1,47 @@
+' Gambas module file
+
+Private PROBLEM_CHARS As String[] = [
+  "&",
+  "<",
+  ">",
+  "\"",
+  "'",
+  " ",
+  "\t"
+]
+
+Private PROBLEM_ESCAPES As String[] = [
+  "&amp;",
+  "&lt;",
+  "&gt;",
+  "&quot;",
+  "&#39;",
+  "&nbsp;",
+  "&nbsp;&nbsp;"
+]
+
+Public Function Escape(text As String) As String
+  
+  Dim result As String = ""
+  
+  For i As Integer = 0 To text.Len - 1
+    result &= EscapeChar(text[i])
+  Next
+  
+  Return result
+  
+End
+
+
+Private Function EscapeChar(c As String) As String
+  
+  Dim index As Integer = Utility.StrInList(c, PROBLEM_CHARS)
+  
+  If index <> -1 Then 
+    Return PROBLEM_ESCAPES[index]
+  Else 
+    Return c
+  Endif
+  
+End
+

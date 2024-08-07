@@ -62,3 +62,12 @@ Public Sub ButtonRun_Click()
   Next
 
 End
+
+Public Sub CodeEdit_KeyPress()
+
+  If Key.Code = Key.Tab Then 
+    CodeEdit.Selection.Text = "  "
+    Stop Event 
+  Endif
+
+End
