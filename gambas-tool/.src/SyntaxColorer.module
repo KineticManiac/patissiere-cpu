@@ -1,7 +1,7 @@
 ' Gambas module file
 
-Const FONT_PREPDIR_BEGIN As String = "<font style='color:#3cdfff'><b>"
-Const FONT_PREPDIR_END As String = "</b></font>"
+Const FONT_DIRECTIVE_BEGIN As String = "<font style='color:#3cdfff'><b>"
+Const FONT_DIRECTIVE_END As String = "</b></font>"
 Const FONT_OPCODE_BEGIN As String = "<font style='color:orange'><b>"
 Const FONT_OPCODE_END As String = "</b></font>"
 Const FONT_REGISTER_BEGIN As String = "<font style='color:lightblue'><b>"
@@ -95,7 +95,7 @@ End
 Private Function ColorWord(word As String) As String
   
   If word = "" Then Return ""
-  If Utility.StrInList(word, Keywords.PREPDIRS, gb.IgnoreCase) <> -1 Then Return FONT_PREPDIR_BEGIN & word & FONT_PREPDIR_END
+  If Utility.StrInList(word, Keywords.DIRECTIVES, gb.IgnoreCase) <> -1 Then Return FONT_DIRECTIVE_BEGIN & word & FONT_DIRECTIVE_END
   If Utility.StrInList(word, Keywords.OPCODES, gb.IgnoreCase) <> -1 Then Return FONT_OPCODE_BEGIN & word & FONT_OPCODE_END
   If Utility.StrInList(word, Keywords.REGISTERS, gb.IgnoreCase) <> -1 Then Return FONT_REGISTER_BEGIN & word & FONT_REGISTER_END
   If InStr(Keywords.NUMERIC_INITIALS, word[0]) <> 0 Then Return FONT_NUMERIC_BEGIN & word & FONT_NUMERIC_END

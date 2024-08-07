@@ -1,6 +1,6 @@
 ' Gambas module file
 
-Public PREPDIRS As String[] = [
+Public DIRECTIVES As String[] = [
   ".DEF",
   ".BYTE",
   ".HALF",

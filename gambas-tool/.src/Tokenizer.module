@@ -105,7 +105,7 @@ End
 Private Function TokenizeWord(word As String) As Token
   
   If word = "" Then Error.Raise("word cannot be empty")
-  If Utility.StrInList(word, Keywords.PREPDIRS, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_PREPDIR)
+  If Utility.StrInList(word, Keywords.DIRECTIVES, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_DIRECTIVE)
   If Utility.StrInList(word, Keywords.OPCODES, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_OPCODE)
   If Utility.StrInList(word, Keywords.REGISTERS, gb.IgnoreCase) <> -1 Then Return Token.Build(word, Token.TYPE_REGISTER)
   If InStr(Keywords.NUMERIC_INITIALS, word[0]) <> 0 Then Return Token.Build(word, Token.TYPE_NUMERIC)
