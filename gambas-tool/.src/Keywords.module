@@ -1,11 +1,11 @@
 ' Gambas module file
 
 Public DIRECTIVES As String[] = [
-  ".ORG",
-  ".DEFINE",
-  ".BYTE",
-  ".HALF",
-  ".WORD"
+  "%ORG",
+  "%DEFINE",
+  "%BYTE",
+  "%HALF",
+  "%WORD"
 ]
 
 Public OPCODES As String[] = [

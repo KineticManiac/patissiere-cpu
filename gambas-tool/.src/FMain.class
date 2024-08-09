@@ -53,6 +53,7 @@ End
 
 Public Sub ButtonRun_Click()
 
+
   Dim tokens As Token[][] = Tokenizer.Tokenize(CodeEdit.Text)
   For i As Integer = 0 To tokens.Length - 1
     For j As Integer = 0 To tokens[i].Length - 1
@@ -64,7 +65,7 @@ Public Sub ButtonRun_Click()
 End
 
 Public Sub CodeEdit_KeyPress()
-
+  Debug Key.Code
   If Key.Code = Key.Tab Then 
     CodeEdit.Selection.Text = "  "
     Stop Event 

@@ -1,7 +1,5 @@
 ' Gambas module file
 
-
-
 Const FONT_DIRECTIVE_BEGIN As String = "<font style='color:#3cdfff'><b>"
 Const FONT_DIRECTIVE_END As String = "</b></font>"
 Const FONT_OPCODE_BEGIN As String = "<font style='color:orange'><b>"
@@ -84,10 +82,10 @@ Private Function ColorLine(code As String) As String
   
   If in_string Then 
     If escaping Then 
-      word &= FONT_ESCAPE_BEGIN & Keywords.STRING_ESCAPE_CHAR & FONT_ESCAPE_END
+      word &= FONT_STRING_BEGIN & RichTextNormalizer.Escape(word) & FONT_ESCAPE_BEGIN & Keywords.STRING_ESCAPE_CHAR & FONT_ESCAPE_END & FONT_STRING_END
+    Else 
+      result &= FONT_STRING_BEGIN & RichTextNormalizer.Escape(word) & FONT_STRING_END
     Endif
-    
-    result &= FONT_STRING_BEGIN & string_marker & word & FONT_STRING_END
   Else 
     result &= ColorWord(word)
   Endif

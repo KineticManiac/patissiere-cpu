@@ -1,11 +1,10 @@
 A-type  : IISS SSFF FFDD DDFF (10xx xxxx xxxx xxxx)
 I-type  : IIII IIFF FFDD DDFF (5432 10xx xxxx xxxx)
-Iw-type : IIII IIFF FFDD DDFF (7654 32xx xxxx xxxx) (The immediate type is I-type, shifted left by 2)
+Ip-type : IIII IIPP FFDD DDFF (5432 10xx xxxx xxxx)
 R-type  : FFSS SSFF FFDD DDFF (xxxx xxxx xxxx xxxx)
+Rp-type : FFSS SSPP FFDD DDFF (xxxx xxxx xxxx xxxx)
 J-type  : IIII IIII FFFF IIFF (9432 1065 xxxx 87xx)
-PI-type : IIII IIPP FFDD DDFF (7654 32xx xxxx xxxx) (The immediate type is I-type, shifted left by 2)
-PR-type : FFSS SSPP FFDD DDFF (xxxx xxxx xxxx xxxx)
-E-type  : FIII FFII FFRR RIFF (x432 xx65 xxxx x7xx) (R: an identifier for a preset list of registers)
+E-type  : IIII IIFF FFRR RFFF (5432 10xx xxxx xxxx) (R: an identifier for a preset list of registers)
 
 bit 4 -> 0, Z
 bits 6:5 -> 0, O^S, O, C
@@ -87,12 +86,12 @@ MOV.I       -> IIII II11 10DD DD10
 MOVEQ.I     -> IIII II11 01DD DD10
 MOVNE.I     -> IIII II11 11DD DD10
 
-ENTER       -> 1III 00II 01RR RI11
-ENTERL      -> 1III 01II 01RR RI11
-EXIT        -> 0III 00II 01RR RI11
-EXITL       -> 0III 01II 01RR RI11
-J.L         -> 0000 1100 0100 0011
-JAL.L       -> 0000 1101 0100 0011
+ENTER       -> IIII II00 01RR R111
+ENTERL      -> IIII II01 01RR R111
+EXIT        -> IIII II00 01RR R011
+EXITL       -> IIII II01 01RR R011
+J.L         -> 0000 0011 0100 0011
+JAL.L       -> 0000 0011 0100 0111
 
 LDW.P       -> 00SS SSPP 11DD DD11
 MOV.RP      -> 0100 00PP 11DD DD11

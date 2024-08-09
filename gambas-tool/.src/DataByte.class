@@ -1,0 +1,17 @@
+' Gambas class file
+
+Public Address As Long
+Public Value As Byte
+
+Public Sub _new(_address As Long, _value As Byte)
+  
+  Address = _address
+  Value = _value
+  
+End
+
+Public Function Build(_address As Long, _value As Byte) As DataByte
+  
+  Return New DataByte(_address, _value)
+  
+End

@@ -1,0 +1,17 @@
+' Gambas class file
+
+Public Address As Long
+Public Tokens As Token[]
+
+Public Sub _new(_address As Long, _tokens As Token[])
+  
+  Address = _address
+  Tokens = _tokens
+  
+End
+
+Public Function Build(_address As Long, _tokens As Token[]) As UnparsedInstruction
+  
+  Return New UnparsedInstruction(_address, _tokens)
+  
+End
