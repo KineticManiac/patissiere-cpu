@@ -1,7 +1,58 @@
 ' Gambas module file
 
-Public Function Process(tokens As Token[]) As String
+Public Function Process(tokensList As Token[][]) As UnparsedProgram
   
+  Dim program As UnparsedProgram = New UnparsedProgram
+  Dim defines As Collection = New Collection
+  Dim global As String = ""
+  Dim address As Long = 0
   
+  For Each tokens As Token[] In tokensList
+    Select Case tokens[0].Word
+      Case "%ORG"
+         If tokens.Length < 2 Then Error "Unexpected end of statement for %ORG"
+         If tokens.Length > 2 Then Error "Unexpected extra token at the end of statement for %ORG"
+         If tokens[1].Type <> Token.TYPE_NUMERIC Then Error "Unexpected token: " & tokens[1].Word
+         
+         address = CLong(tokens[1].Word)
+      Case "%DEFINE"
+        If tokens.Length < 4 Then Error "Unexpected end of statement for %DEFINE"
+        If tokens.Length > 4 Then Error "Unexpected extra token at the end of statement for %DEFINE"
+        If tokens[1].Type <> Token.TYPE_OTHER Then Error "Unexpected token: " & tokens[1].Word
+        If tokens[2].Word <> "," Then Error "Unexpected token: " & tokens[2].Word
+         
+        If defines.Exist(tokens[1].word) Then Error "${tokens[1].Word} is already defined"
+        
+        defines.Add(tokens[3], tokens[1].Word)
+      Case "%BYTE"
+      Case "%HALF"
+      Case "%WORD"
+      Case Else 
+          If tokens[0].Type = Token.TYPE_OTHER Then       
+            If tokens.Length < 2 Then Error "Unexpected end of statement for label declaration"
+            If tokens.Length > 2 Then Error "Unexpected extra token at the end of statement for label declaration"
+            If tokens[1].word <> ":" Then Error "Unexpected token: " & tokens[0].Word
+            
+            Dim sLabel As String = tokens[0].Word
+            If sLabel[0] = "." Then 
+              If sLabel.Len = 1 Then Error ". cannot be used as a label"
+              If global = "" Then Error "No parent label available"
+              
+              Dim labelFullName As String = global & sLabel
+              
+              If defines.Exist(labelFullName) Then Error "${labelFullName} is already defined"
+              
+              defines.Add(Token.Build(address, Token.TYPE_NUMERIC), labelFullName)
+            Else 
+              If defines.Exist(sLabel) Then Error "${sLabel} is already defined"
+              global = sLabel
+              defines.Add(Token.Build(address, Token.TYPE_NUMERIC), sLabel)
+            Endif
+          Else 
+            program.Instructions.Add(UnparsedInstruction.Build(address, tokens))
+            address += 2
+          Endif
+    End Select
+  Next
   
 End
