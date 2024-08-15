@@ -53,19 +53,18 @@ End
 
 Public Sub ButtonRun_Click()
 
-
-  Dim tokens As Token[][] = Tokenizer.Tokenize(CodeEdit.Text)
-  For i As Integer = 0 To tokens.Length - 1
-    For j As Integer = 0 To tokens[i].Length - 1
-      Debug tokens[i][j].Type & "(" & tokens[i][j].Word & ")"
+  Dim stmList As Statement[] = Preprocessor.Process(Tokenizer.Tokenize(CodeEdit.Text))
+  For i As Integer = 0 To stmList.Length - 1
+    Print "At: " & stmList[i].Address
+    For j As Integer = 0 To stmList[i].Tokens.Length - 1
+      Print "\t" & stmList[i].Tokens[j].Type & "(" & stmList[i].Tokens[j].Word & ")"
     Next
-    Debug "\n"
+    Print "\n"
   Next
 
 End
 
 Public Sub CodeEdit_KeyPress()
-  Debug Key.Code
   If Key.Code = Key.Tab Then 
     CodeEdit.Selection.Text = "  "
     Stop Event 

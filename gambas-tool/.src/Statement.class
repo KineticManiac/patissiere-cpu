@@ -10,8 +10,8 @@ Public Sub _new(_address As Long, _tokens As Token[])
   
 End
 
-Public Function Build(_address As Long, _tokens As Token[]) As UnparsedInstruction
+Static Public Function Build(_address As Long, _tokens As Token[]) As Statement
   
-  Return New UnparsedInstruction(_address, _tokens)
+  Return New Statement(_address, _tokens)
   
 End

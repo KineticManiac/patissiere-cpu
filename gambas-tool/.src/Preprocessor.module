@@ -1,32 +1,78 @@
 ' Gambas module file
 
-Public Function Process(tokensList As Token[][]) As UnparsedProgram
+Public Function Process(tokensList As Token[][]) As Statement[]
+  'Get values for defines
   
-  Dim program As UnparsedProgram = New UnparsedProgram
+  Dim address As Long = 0
+  Dim statementList1 As Statement[] = []
   Dim defines As Collection = New Collection
   Dim global As String = ""
-  Dim address As Long = 0
   
   For Each tokens As Token[] In tokensList
     Select Case tokens[0].Word
+      'Bad code alarm :(
       Case "%ORG"
          If tokens.Length < 2 Then Error "Unexpected end of statement for %ORG"
          If tokens.Length > 2 Then Error "Unexpected extra token at the end of statement for %ORG"
-         If tokens[1].Type <> Token.TYPE_NUMERIC Then Error "Unexpected token: " & tokens[1].Word
+         Select Case tokens[1].Type
+          Case Token.TYPE_NUMERIC
+            address = tokens[1].Word
+          Case Token.TYPE_OTHER
+            If tokens[1].Word = "." Then Error "%ORG cannot take the current address as its argument!"
+            If Not defines.Exist(tokens[1].Word) Then Error "Unexpected token: " & tokens[1].word & " (Note: It cannot be defined later for %ORG)"
+            
+            address = defines[tokens[1].Word].Word
+          Case Else 
+            Error "Unexpected token: " & tokens[1].Word
+         End Select
          
-         address = CLong(tokens[1].Word)
       Case "%DEFINE"
         If tokens.Length < 4 Then Error "Unexpected end of statement for %DEFINE"
         If tokens.Length > 4 Then Error "Unexpected extra token at the end of statement for %DEFINE"
         If tokens[1].Type <> Token.TYPE_OTHER Then Error "Unexpected token: " & tokens[1].Word
         If tokens[2].Word <> "," Then Error "Unexpected token: " & tokens[2].Word
          
-        If defines.Exist(tokens[1].word) Then Error "${tokens[1].Word} is already defined"
+        If defines.Exist(tokens[1].word) Then Error tokens[1].Word & " is already defined"
         
         defines.Add(tokens[3], tokens[1].Word)
-      Case "%BYTE"
-      Case "%HALF"
-      Case "%WORD"
+      Case "%BYTE", "%HALF", "%WORD"
+        Dim declType As String = tokens[0].Word
+      
+        For i As Integer = 2 To tokens.Length - 2 Step 2
+          If tokens[i].Word <> "," Then Error "Expected comma for " & declType
+        Next
+        
+        If tokens[tokens.Length - 1].Word = "," Then Error "Unexpected comma for " & declType
+        
+        Dim declWidth As Integer
+        Select Case declType
+          Case "%BYTE"
+            declWidth = 1
+          Case "%HALF"
+            declWidth = 2
+          Case "%WORD"
+            declWidth = 4
+          Case Else 
+            Error "Impossible declType = " & declType
+        End Select
+        
+        Dim declLen As Integer = 0
+        For i As Integer = 1 To tokens.length - 1 Step 2
+          Dim vToken As Token = tokens[i]
+          
+          Select Case vToken.Type
+            Case Token.TYPE_STRING
+              declLen += declWidth * String.Len(vToken.Word)
+            Case Token.TYPE_NUMERIC, Token.TYPE_OTHER
+              declLen += declWidth
+            Case Else 
+              Error "Unexpected token " & vToken.Word & " in " & declWidth 
+          End Select
+        Next
+        
+        statementList1.Add(Statement.Build(address, tokens))
+        
+        address += declLen
       Case Else 
           If tokens[0].Type = Token.TYPE_OTHER Then       
             If tokens.Length < 2 Then Error "Unexpected end of statement for label declaration"
@@ -40,19 +86,74 @@ Public Function Process(tokensList As Token[][]) As UnparsedProgram
               
               Dim labelFullName As String = global & sLabel
               
-              If defines.Exist(labelFullName) Then Error "${labelFullName} is already defined"
+              If defines.Exist(labelFullName) Then Error labelFullName & " is already defined"
               
               defines.Add(Token.Build(address, Token.TYPE_NUMERIC), labelFullName)
             Else 
-              If defines.Exist(sLabel) Then Error "${sLabel} is already defined"
+              If defines.Exist(sLabel) Then Error sLabel & " is already defined"
               global = sLabel
               defines.Add(Token.Build(address, Token.TYPE_NUMERIC), sLabel)
             Endif
           Else 
-            program.Instructions.Add(UnparsedInstruction.Build(address, tokens))
+            statementList1.Add(Statement.Build(address, tokens))
             address += 2
           Endif
     End Select
   Next
   
+  'Put defines in their places
+  
+  Dim statementList2 As Statement[] = []
+  
+  For Each stm As Statement In statementList1
+    Dim newTokens As Token[] = []
+    For Each vToken As Token In stm.Tokens
+      If vToken.Type = Token.TYPE_OTHER Then 
+        If vToken.Word = "." Then 
+          newTokens.Add(Token.Build(stm.Address, Token.TYPE_NUMERIC))
+        Else 
+          If Not defines.Exist(vToken.Word) Then Error "Unknown mnemonic " & vToken.Word
+        
+          newTokens.Add(defines[vToken.Word])
+        Endif
+      Else 
+        newTokens.Add(vToken)
+      Endif
+    Next
+    
+    Dim newStm As Statement = New Statement(stm.Address, newTokens)
+    statementList2.Add(newStm)
+  Next
+  
+  Return statementList2
+  
+  'Extract instructions and data
+  
+  ' Dim address As Long = 0
+  ' Dim program As UnparsedProgram = New UnparsedProgram
+  ' 
+  ' For Each tokens As Token[] In tokensList3
+  '   If tokens[0].Type = Token.TYPE_DIRECTIVE Then 
+  '     Dim declWidth As String = tokens[0].Word
+  '     
+  '     For i As Integer = 2 To tokens.Length - 2 Step 2
+  '       If tokens[i].Word <> "," Then Error "Expected comma for ${declWidth}"
+  '     Next
+  '     
+  '     If tokens[tokens.Length - 1] = "," Then Error "Unexpected comma for ${declWidth}"
+  '     
+  '     For i As Integer = 1 To tokens.length - 1 Step 2
+  '       Dim vToken As Token = tokens[i]
+  '       
+  '       Select Case vToken.Type
+  '         Case Token.TYPE_STRING
+  '         Case Token.TYPE_NUMERIC
+  '       End Select
+  '     Next
+  '   Else 
+  '     
+  '   Endif
+  ' Next
+  
 End
+
