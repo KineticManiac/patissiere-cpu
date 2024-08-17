@@ -1,0 +1,45 @@
+' Gambas module file
+
+Public Function Parse(StatementList As Statement[]) As Program
+  
+  Dim vProgram As Program = New Program
+  
+  For Each iStatement As Statement In StatementList
+    Dim vCommand As Token = iStatement.Tokens[0]
+    Select Case vCommand.Type
+      Case Token.TYPE_DIRECTIVE
+        For i As Integer = 1 To iStatement.Tokens.Length - 1 Step 2
+          Dim vArg As Token = iStatement.Tokens[i]
+          
+          Select Case vArg.Type
+            Case Token.TYPE_STRING
+              For i As Integer = 0 To vArg.Word.Length - 1
+                Dim unicode As Integer = String.Code(vArg.Word, i)
+                Dim vDataBytes As DataByte[] = GetDataBytes(vCommand.Word, unicode)
+                
+                For Each vDataByte As DataByte In vDataBytes
+                  vProgram.Data.Add(vDataByte)
+                Next
+              Next
+            Case Token.TYPE_NUMERIC
+              Dim vDataBytes As DataByte[] = GetDataBytes(vCommand.Word, vArg.Word)
+              For Each vDataByte As DataByte In vDataBytes
+                vProgram.Data.Add(vDataByte)
+              Next
+            Case Else 
+              Error "This shouldn't happen!"
+          End Select
+        Next
+      Case Token.TYPE_OPCODE
+        
+      Case Else 
+        Error "This shouldn't happen!"
+    End Select
+  Next
+  
+End 
+  
+  
+Private Function GetDataBytes(DeclType As String, Value As Integer) As DataByte[]
+  
+End 

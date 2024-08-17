@@ -1,0 +1,24 @@
+' Gambas class file
+
+Public Address As Long
+Public Operation As String
+Public Arguments As Argument[]
+
+Public Sub _new(Operation As String)
+  
+  Me.Operation = Operation
+  Me.Arguments = []
+  
+End
+
+Public Function Build(Operation As String, ...) As Instruction
+  
+  Dim Result As Instruction = New Instruction(Operation)
+  
+  For Each iVar As Argument In Param.All
+    Result.Arguments.Add(iVar)
+  Next
+  
+  Return Result
+  
+End

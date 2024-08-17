@@ -1,0 +1,11 @@
+' Gambas class file
+
+Public Instructions As Instruction[] 
+Public Data As DataByte[]
+
+Public Sub _new()
+  
+  Instructions = []
+  Data = []
+  
+End
