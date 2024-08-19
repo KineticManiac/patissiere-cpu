@@ -11,7 +11,7 @@ Public Sub _new(Operation As String)
   
 End
 
-Public Function Build(Operation As String, ...) As Instruction
+Static Public Function Build(Operation As String, ...) As Instruction
   
   Dim Result As Instruction = New Instruction(Operation)
   

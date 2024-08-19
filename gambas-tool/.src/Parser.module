@@ -31,15 +31,93 @@ Public Function Parse(StatementList As Statement[]) As Program
           End Select
         Next
       Case Token.TYPE_OPCODE
-        
+        Select Case vCommand.Word
+            Case "JAL"
+            Case "J"
+            Case "JEQ"
+            Case "JNE"
+            Case "JLT"
+            Case "JGE"
+            Case "JLTU"
+            Case "JGEU"
+            Case "JLE"
+            Case "JGT"
+            Case "JLEU"
+            Case "JGTU"
+            Case "JO"
+            Case "JNO"
+            Case "JS"
+            Case "JNS"
+            Case "CMP"
+            Case "JR"
+            Case "AND"
+            Case "ANDN"
+            Case "OR"
+            Case "ORN"
+            Case "XOR"
+            Case "XNOR"
+            Case "ADD"
+            Case "SH1ADD"
+            Case "SH2ADD"
+            Case "SH3ADD"
+            Case "SUB"
+            Case "ROL"
+            Case "ROR"
+            Case "ZEXTB"
+            Case "ZEXTH"
+            Case "SEXTB"
+            Case "SEXTH"
+            Case "LDB"
+            Case "LDH" 
+            Case "LDW" 
+            Case "STB" 
+            Case "STH" 
+            Case "STW"
+            Case "TEST"
+            Case "MOV"
+            Case "MOVEQ"
+            Case "MOVNE"
+            Case "MOVLT"
+            Case "MOVGE"
+            Case "MOVLE"
+            Case "MOVGT"
+            Case "MOVO"
+            Case "MOVNO"
+            Case "MOVS"
+            Case "MOVNS"
+            Case "MOVLTU"
+            Case "MOVGEU"
+            Case "MOVLEU"
+            Case "MOVGTU"
+            Case "SH1"
+            Case "SH2"
+            Case "SH3"
+            Case "SRL"
+            Case "SRA"
+            Case "ENTER"
+            Case "ENTERL"
+            Case "EXIT"
+            Case "EXITL"
+            Case "NOP"
+              vProgram.Instructions.Add(NoArguments(iStatement))
+            Case Else 
+              Error "This shouldn't happen!"
+        End Select
       Case Else 
         Error "This shouldn't happen!"
     End Select
   Next
-  
 End 
   
+Private Function NoArguments(StatementA As Statement) As Instruction
+  
+  If StatementA.Tokens.Length <> 1 Then Error "Too many arguments for " & StatementA.Tokens[0].Word
+  
+  Return Instruction.Build(StatementA.Tokens[0].Word)
+  
+End
+
   
 Private Function GetDataBytes(DeclType As String, Value As Integer) As DataByte[]
-  
+  'TO-DO: Get dem data bayts!
 End 

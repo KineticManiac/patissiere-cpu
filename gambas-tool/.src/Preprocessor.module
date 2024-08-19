@@ -127,33 +127,5 @@ Public Function Process(tokensList As Token[][]) As Statement[]
   
   Return statementList2
   
-  'Extract instructions and data
-  
-  ' Dim address As Long = 0
-  ' Dim program As UnparsedProgram = New UnparsedProgram
-  ' 
-  ' For Each tokens As Token[] In tokensList3
-  '   If tokens[0].Type = Token.TYPE_DIRECTIVE Then 
-  '     Dim declWidth As String = tokens[0].Word
-  '     
-  '     For i As Integer = 2 To tokens.Length - 2 Step 2
-  '       If tokens[i].Word <> "," Then Error "Expected comma for ${declWidth}"
-  '     Next
-  '     
-  '     If tokens[tokens.Length - 1] = "," Then Error "Unexpected comma for ${declWidth}"
-  '     
-  '     For i As Integer = 1 To tokens.length - 1 Step 2
-  '       Dim vToken As Token = tokens[i]
-  '       
-  '       Select Case vToken.Type
-  '         Case Token.TYPE_STRING
-  '         Case Token.TYPE_NUMERIC
-  '       End Select
-  '     Next
-  '   Else 
-  '     
-  '   Endif
-  ' Next
-  
 End
 
