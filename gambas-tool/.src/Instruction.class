@@ -4,16 +4,17 @@ Public Address As Long
 Public Operation As String
 Public Arguments As Argument[]
 
-Public Sub _new(Operation As String)
+Public Sub _new(Address As Long, Operation As String)
   
+  Me.Address = Address
   Me.Operation = Operation
   Me.Arguments = []
   
 End
 
-Static Public Function Build(Operation As String, ...) As Instruction
+Static Public Function Build(Address As Long, Operation As String, ...) As Instruction
   
-  Dim Result As Instruction = New Instruction(Operation)
+  Dim Result As Instruction = New Instruction(Address, Operation)
   
   For Each iVar As Argument In Param.All
     Result.Arguments.Add(iVar)

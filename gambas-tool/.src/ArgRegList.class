@@ -1,0 +1,11 @@
+' Gambas class file
+
+Inherits Argument
+
+Public RegCount As Integer
+
+Public Sub _new(RegCount As Integer)
+  
+  Me.RegCount = RegCount
+  
+End

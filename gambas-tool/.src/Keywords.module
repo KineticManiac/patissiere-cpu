@@ -9,7 +9,6 @@ Public DIRECTIVES As String[] = [
 ]
 
 Public OPCODES As String[] = [
-  "JAL",
   "J",
   "JEQ",
   "JNE",
@@ -75,7 +74,9 @@ Public OPCODES As String[] = [
   "ENTERL",
   "EXIT",
   "EXITL",
-  "NOP"
+  "NOP",
+  "RET",
+  "LINK"
 ]
 
 Public REGISTERS As String[] = [

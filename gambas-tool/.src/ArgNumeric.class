@@ -1,0 +1,11 @@
+' Gambas class file
+
+Inherits Argument
+
+Public Number As Integer
+
+Public Sub _new(Number As Integer)
+  
+  Me.Number = Number
+  
+End

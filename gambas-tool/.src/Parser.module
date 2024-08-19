@@ -3,6 +3,7 @@
 Public Function Parse(StatementList As Statement[]) As Program
   
   Dim vProgram As Program = New Program
+  Dim tDataBytes As DataByte[]
   
   For Each iStatement As Statement In StatementList
     Dim vCommand As Token = iStatement.Tokens[0]
@@ -13,18 +14,18 @@ Public Function Parse(StatementList As Statement[]) As Program
           
           Select Case vArg.Type
             Case Token.TYPE_STRING
-              For i As Integer = 0 To vArg.Word.Length - 1
-                Dim unicode As Integer = String.Code(vArg.Word, i)
-                Dim vDataBytes As DataByte[] = GetDataBytes(vCommand.Word, unicode)
+              For j As Integer = 0 To vArg.Word.Length - 1
+                Dim unicode As Integer = String.Code(vArg.Word, j)
+                tDataBytes = GetDataBytes(vCommand.Word, unicode)
                 
-                For Each vDataByte As DataByte In vDataBytes
-                  vProgram.Data.Add(vDataByte)
+                For Each iDataByte As DataByte In tDataBytes
+                  vProgram.Data.Add(iDataByte)
                 Next
               Next
             Case Token.TYPE_NUMERIC
-              Dim vDataBytes As DataByte[] = GetDataBytes(vCommand.Word, vArg.Word)
-              For Each vDataByte As DataByte In vDataBytes
-                vProgram.Data.Add(vDataByte)
+              tDataBytes = GetDataBytes(vCommand.Word, vArg.Word)
+              For Each iDataByte As DataByte In tDataBytes
+                vProgram.Data.Add(iDataByte)
               Next
             Case Else 
               Error "This shouldn't happen!"
@@ -32,7 +33,6 @@ Public Function Parse(StatementList As Statement[]) As Program
         Next
       Case Token.TYPE_OPCODE
         Select Case vCommand.Word
-            Case "JAL"
             Case "J"
             Case "JEQ"
             Case "JNE"
@@ -94,11 +94,9 @@ Public Function Parse(StatementList As Statement[]) As Program
             Case "SH3"
             Case "SRL"
             Case "SRA"
-            Case "ENTER"
-            Case "ENTERL"
-            Case "EXIT"
-            Case "EXITL"
-            Case "NOP"
+            Case "ENTER", "ENTERL", "EXIT", "EXITL"
+              vProgram.Instructions.Add(EnterExit(iStatement))
+            Case "NOP", "RET", "LINK"
               vProgram.Instructions.Add(NoArguments(iStatement))
             Case Else 
               Error "This shouldn't happen!"
@@ -109,11 +107,45 @@ Public Function Parse(StatementList As Statement[]) As Program
   Next
 End 
   
+Private Function EnterExit(StatementA As Statement) As Instruction
+  
+  If StatementA.Tokens[1].Word <> "[" Or If StatementA.Tokens[3].Word <> "-" Or If StatementA.Tokens[5].Word <> "]" Then Error "Invalid syntax for " & StatementA.Tokens[0].Word
+  If StatementA.Tokens[2].Type <> Token.TYPE_REGISTER Or If StatementA.Tokens[4].Type <> Token.TYPE_REGISTER Then Error "Invalid syntax for " & StatementA.Tokens[0].Word
+  
+  Dim ExtraSpace As Integer
+  If StatementA.Tokens.Length = 6 Then 
+    ExtraSpace = 0
+  Else If StatementA.Tokens.Length = 8 Then 
+    If StatementA.Tokens[6].word <> "," Or If StatementA.Tokens[7].Type <> Token.TYPE_NUMERIC Then Error "Invalid syntax for " & StatementA.Tokens[0].Word
+    
+    ExtraSpace = StatementA.Tokens[7].Word
+  Else 
+    Error "Invalid syntax for " & StatementA.Tokens[0].Word
+  Endif
+  
+  Dim RegIndex1 As Integer = Utility.StrInList(StatementA.Tokens[2].Word, Keywords.REGISTERS)
+  Dim RegIndex2 As Integer = Utility.StrInList(StatementA.Tokens[4].Word, Keywords.REGISTERS)
+  
+  If RegIndex1 > 15 Or If RegIndex2 > 15 Then Error "Register list cannot include SP, AP, BP, CP, or LR"
+  If RegIndex1 <> 0 Then Error "Register list must start from R0"
+  If RegIndex2 % 2 <> 1 Then Error "Register list must end with an odd-indexed register"
+  
+  Dim RegCount As Integer = RegIndex2 + 1
+  Dim Arg1 As Argument = New ArgRegList(RegCount)
+  
+  Dim TotalSpace As Integer = ExtraSpace + RegCount * 4
+  Dim Arg2 As Argument = New ArgNumeric(TotalSpace)
+  
+  Return Instruction.Build(StatementA.Address, StatementA.Tokens[0].Word, Arg1, Arg2)
+  
+End
+
+  
 Private Function NoArguments(StatementA As Statement) As Instruction
   
   If StatementA.Tokens.Length <> 1 Then Error "Too many arguments for " & StatementA.Tokens[0].Word
   
-  Return Instruction.Build(StatementA.Tokens[0].Word)
+  Return Instruction.Build(StatementA.Address, StatementA.Tokens[0].Word)
   
 End
 
