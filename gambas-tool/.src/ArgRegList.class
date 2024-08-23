@@ -6,6 +6,10 @@ Public RegCount As Integer
 
 Public Sub _new(RegCount As Integer)
   
+  Me.Type = Argument.TYPE_REGLIST
   Me.RegCount = RegCount
+  
+  If RegCount > 16 Then Error.Raise("Too many registers!")
+  If RegCount % 2 <> 0 Then Error.Raise("Invalid register count!")
   
 End

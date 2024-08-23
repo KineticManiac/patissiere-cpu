@@ -1,0 +1,14 @@
+' Gambas class file
+
+Inherits Argument
+
+Public Index As Integer
+
+Public Sub _new(Index As Integer)
+  
+  Me.Type = Argument.TYPE_REGISTER
+  Me.Index = Index
+  
+  If index < 0 Or If index > 15 Then Error.Raise("ArgRegister class cannot refer to special registers!")
+  
+End

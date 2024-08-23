@@ -6,6 +6,7 @@ Public Number As Integer
 
 Public Sub _new(Number As Integer)
   
+  Me.Type = Argument.TYPE_NUMERIC
   Me.Number = Number
   
 End

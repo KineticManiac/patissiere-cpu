@@ -12,14 +12,14 @@ Public Function Process(tokensList As Token[][]) As Statement[]
     Select Case tokens[0].Word
       'Bad code alarm :(
       Case "%ORG"
-         If tokens.Length < 2 Then Error "Unexpected end of statement for %ORG"
-         If tokens.Length > 2 Then Error "Unexpected extra token at the end of statement for %ORG"
+         If tokens.Length < 2 Then Error.Raise("Unexpected end of statement for %ORG")
+         If tokens.Length > 2 Then Error.Raise("Unexpected extra token at the end of statement for %ORG")
          Select Case tokens[1].Type
           Case Token.TYPE_NUMERIC
             address = tokens[1].Word
           Case Token.TYPE_OTHER
-            If tokens[1].Word = "." Then Error "%ORG cannot take the current address as its argument!"
-            If Not defines.Exist(tokens[1].Word) Then Error "Unexpected token: " & tokens[1].word & " (Note: It cannot be defined later for %ORG)"
+            If tokens[1].Word = "." Then Error.Raise("%ORG cannot take the current address as its argument!")
+            If Not defines.Exist(tokens[1].Word) Then Error.Raise("Unexpected token: " & tokens[1].word & " (Note: It cannot be defined later for %ORG)")
             
             address = defines[tokens[1].Word].Word
           Case Else 
@@ -27,22 +27,22 @@ Public Function Process(tokensList As Token[][]) As Statement[]
          End Select
          
       Case "%DEFINE"
-        If tokens.Length < 4 Then Error "Unexpected end of statement for %DEFINE"
-        If tokens.Length > 4 Then Error "Unexpected extra token at the end of statement for %DEFINE"
-        If tokens[1].Type <> Token.TYPE_OTHER Then Error "Unexpected token: " & tokens[1].Word
-        If tokens[2].Word <> "," Then Error "Unexpected token: " & tokens[2].Word
+        If tokens.Length < 4 Then Error.Raise("Unexpected end of statement for %DEFINE")
+        If tokens.Length > 4 Then Error.Raise("Unexpected extra token at the end of statement for %DEFINE")
+        If tokens[1].Type <> Token.TYPE_OTHER Then Error.Raise("Unexpected token: " & tokens[1].Word)
+        If tokens[2].Word <> "," Then Error.Raise("Unexpected token: " & tokens[2].Word)
          
-        If defines.Exist(tokens[1].word) Then Error tokens[1].Word & " is already defined"
+        If defines.Exist(tokens[1].word) Then Error.Raise(tokens[1].Word & " is already defined")
         
         defines.Add(tokens[3], tokens[1].Word)
       Case "%BYTE", "%HALF", "%WORD"
         Dim declType As String = tokens[0].Word
       
         For i As Integer = 2 To tokens.Length - 2 Step 2
-          If tokens[i].Word <> "," Then Error "Expected comma for " & declType
+          If tokens[i].Word <> "," Then Error.Raise("Expected comma for " & declType)
         Next
         
-        If tokens[tokens.Length - 1].Word = "," Then Error "Unexpected comma for " & declType
+        If tokens[tokens.Length - 1].Word = "," Then Error.Raise("Unexpected comma for " & declType)
         
         Dim declWidth As Integer
         Select Case declType
@@ -53,7 +53,7 @@ Public Function Process(tokensList As Token[][]) As Statement[]
           Case "%WORD"
             declWidth = 4
           Case Else 
-            Error "Impossible declType = " & declType
+            Error.Raise("Impossible declType = " & declType)
         End Select
         
         Dim declLen As Integer = 0
@@ -66,7 +66,7 @@ Public Function Process(tokensList As Token[][]) As Statement[]
             Case Token.TYPE_NUMERIC, Token.TYPE_OTHER
               declLen += declWidth
             Case Else 
-              Error "Unexpected token " & vToken.Word & " in " & declWidth 
+              Error.Raise("Unexpected token " & vToken.Word & " in " & declWidth)
           End Select
         Next
         
@@ -75,22 +75,22 @@ Public Function Process(tokensList As Token[][]) As Statement[]
         address += declLen
       Case Else 
           If tokens[0].Type = Token.TYPE_OTHER Then       
-            If tokens.Length < 2 Then Error "Unexpected end of statement for label declaration"
-            If tokens.Length > 2 Then Error "Unexpected extra token at the end of statement for label declaration"
-            If tokens[1].word <> ":" Then Error "Unexpected token: " & tokens[0].Word
+            If tokens.Length < 2 Then Error.Raise("Unexpected end of statement for label declaration")
+            If tokens.Length > 2 Then Error.Raise("Unexpected extra token at the end of statement for label declaration")
+            If tokens[1].word <> ":" Then Error.Raise("Unexpected token: " & tokens[0].Word)
             
             Dim sLabel As String = tokens[0].Word
             If sLabel[0] = "." Then 
-              If sLabel.Len = 1 Then Error ". cannot be used as a label"
-              If global = "" Then Error "No parent label available"
+              If sLabel.Len = 1 Then Error.Raise(". cannot be used as a label")
+              If global = "" Then Error.Raise("No parent label available")
               
               Dim labelFullName As String = global & sLabel
               
-              If defines.Exist(labelFullName) Then Error labelFullName & " is already defined"
+              If defines.Exist(labelFullName) Then Error.Raise(labelFullName & " is already defined")
               
               defines.Add(Token.Build(address, Token.TYPE_NUMERIC), labelFullName)
             Else 
-              If defines.Exist(sLabel) Then Error sLabel & " is already defined"
+              If defines.Exist(sLabel) Then Error.Raise(sLabel & " is already defined")
               global = sLabel
               defines.Add(Token.Build(address, Token.TYPE_NUMERIC), sLabel)
             Endif
@@ -112,7 +112,7 @@ Public Function Process(tokensList As Token[][]) As Statement[]
         If vToken.Word = "." Then 
           newTokens.Add(Token.Build(stm.Address, Token.TYPE_NUMERIC))
         Else 
-          If Not defines.Exist(vToken.Word) Then Error "Unknown mnemonic " & vToken.Word
+          If Not defines.Exist(vToken.Word) Then Error.Raise("Unknown mnemonic " & vToken.Word)
         
           newTokens.Add(defines[vToken.Word])
         Endif

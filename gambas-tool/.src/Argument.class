@@ -1,3 +1,6 @@
 ' Gambas class file
 
 Create Private
+
+Public Enum TYPE_NUMERIC, TYPE_REGISTER, TYPE_REGLIST
+Public Type As Integer
