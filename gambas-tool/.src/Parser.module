@@ -1,5 +1,98 @@
 ' Gambas module file
 
+Private OpcodeConversionMap As Collection = [
+  "J": Instruction.OP_J,
+  "JEQ": Instruction.OP_JEQ,
+  "JNE": Instruction.OP_JNE,
+  "JLT": Instruction.OP_JLT,
+  "JGE": Instruction.OP_JGE,
+  "JGTU": Instruction.OP_JGTU,
+  "JLEU": Instruction.OP_JLEU,
+  "JLE": Instruction.OP_JLE,
+  "JGT": Instruction.OP_JGT,
+  "JGEU": Instruction.OP_JGEU,
+  "JLTU": Instruction.OP_JLTU,
+  "JO": Instruction.OP_JO,
+  "JNO": Instruction.OP_JNO,
+  "JS": Instruction.OP_JS,
+  "JNS": Instruction.OP_JNS,
+  
+  "TEST": Instruction.OP_TEST,
+  "TESTN": Instruction.OP_TESTN,
+  "AND": Instruction.OP_AND,
+  "ANDN": Instruction.OP_ANDN,
+  "OR": Instruction.OP_OR,
+  "ORN": Instruction.OP_ORN,
+  "XOR": Instruction.OP_XOR,
+  "XNOR": Instruction.OP_XNOR,
+  "STB": Instruction.OP_STB,
+  "STH": Instruction.OP_STH,
+  "STW": Instruction.OP_STW,
+  "LDB": Instruction.OP_LDB,
+  "LDH": Instruction.OP_LDH,
+  "LDW": Instruction.OP_LDW,
+  "ADD": Instruction.OP_SHADD,
+  "SH1ADD": Instruction.OP_SHADD,
+  "SH2ADD": Instruction.OP_SHADD,
+  "SH3ADD": Instruction.OP_SHADD,
+  "ADC": Instruction.OP_ADC,
+  "SBC": Instruction.OP_SBC,
+  "SUB": Instruction.OP_SUB,
+  "ZEXTB": Instruction.OP_ZEXTB,
+  "ZEXTH": Instruction.OP_ZEXTH,
+  "SEXTB": Instruction.OP_SEXTB,
+  "SEXTH": Instruction.OP_SEXTH,
+  
+  "CMP": Instruction.OP_CMP,
+  "MOV": Instruction.OP_MOV,
+  "MOVEQ": Instruction.OP_MOVEQ,
+  "MOVNE": Instruction.OP_MOVNE,
+  "MOVLT": Instruction.OP_MOVLT,
+  "MOVGE": Instruction.OP_MOVGE,
+  "MOVLE": Instruction.OP_MOVLE,
+  "MOVGT": Instruction.OP_MOVGT,
+  "MOVO": Instruction.OP_MOVO,
+  "MOVNO": Instruction.OP_MOVNO,
+  "MOVS": Instruction.OP_MOVS,
+  "MOVNS": Instruction.OP_MOVNS,
+  "MOVGTU": Instruction.OP_MOVGTU,
+  "MOVLEU": Instruction.OP_MOVLEU,
+  "MOVGEU": Instruction.OP_MOVGEU,
+  "MOVLTU": Instruction.OP_MOVLTU,
+  
+  "TEST:I": Instruction.OP_TEST_I,
+  "AND:I": Instruction.OP_AND_I,
+  "OR:I": Instruction.OP_OR_I,
+  "XOR:I": Instruction.OP_XOR_I,
+  "STW:I": Instruction.OP_STW_I,
+  "LDW:I": Instruction.OP_LDW_I,
+  "ADD:I": Instruction.OP_ADD_I,
+  "SH1": Instruction.OP_SH,
+  "SH2": Instruction.OP_SH,
+  "SH3": Instruction.OP_SH,
+  "SRL": Instruction.OP_SRL,
+  "SRA": Instruction.OP_SRA,
+  "CMP:I": Instruction.OP_CMP_I,
+  "MOVEQ:I": Instruction.OP_MOVEQ_I,
+  "MOVNE:I": Instruction.OP_MOVNE_I,
+  
+  "ENTER": Instruction.OP_ENTER,
+  "ENTERL": Instruction.OP_ENTERL,
+  "EXIT": Instruction.OP_EXIT,
+  "EXITL": Instruction.OP_EXITL,
+  "LINK": Instruction.OP_LINK,
+  "RET": Instruction.OP_RET,
+  
+  "LDW:P": Instruction.OP_LDW_P,
+  "MOV:RP": Instruction.OP_MOV_RP,
+  "MOV:RL": Instruction.OP_MOV_RL,
+  "STW:P": Instruction.OP_STW_P,
+  "MOV:PR": Instruction.OP_MOV_PR,
+  "MOV:LR": Instruction.OP_MOV_LR,
+  "LDW:PI": Instruction.OP_LDW_PI,
+  "STW:PI": Instruction.OP_STW_PI,
+]
+
 Public Function Parse(StatementList As Statement[]) As Program
   
   Dim vProgram As Program = New Program
@@ -33,25 +126,17 @@ Public Function Parse(StatementList As Statement[]) As Program
         Next
       Case Token.TYPE_OPCODE
         Select Case vCommand.Word
-            Case "J"
-            Case "JEQ"
-            Case "JNE"
-            Case "JLT"
-            Case "JGE"
-            Case "JLTU"
-            Case "JGEU"
-            Case "JLE"
-            Case "JGT"
-            Case "JLEU"
-            Case "JGTU"
-            Case "JO"
-            Case "JNO"
-            Case "JS"
-            Case "JNS"
-            Case "LDB", "LDH", "LDW", "STB", "STH", "STW"
-            Case "CMP", "AND", "OR", "XOR", "ADD", "ROL", "ROR", "TEST", "MOV", "MOVEQ", "MOVNE"
-            Case "ANDN", "ORN", "XNOR", "SH1ADD", "SH2ADD", "SH3ADD", "SUB", "ZEXTB", "ZEXTH", "SEXTB", "SEXTH", "TESTN", "MOVLT", "MOVLE", "MOVGT", "MOVGE", "MOVLTU", "MOVLEU", "MOVGTU", "MOVGEU", "MOVS", "MOVNS", "MOVO", "MOVNO"
+            Case "J", "JEQ", "JNE", "JLT", "JGE", "JLTU", "JGEU", "JLE", "JGT", "JLEU", "JGTU", "JO", "JNO", "JS", "JNS"
+            Case "LDW", "STW"
+            Case "LDB", "LDH", "STB", "STH"
+            Case "MOV"
+              vProgram.Instructions.Add(MovOp(iStatement))
+            Case "CMP", "AND", "OR", "XOR", "ADD", "ROL", "ROR", "TEST", "MOVEQ", "MOVNE"
+              vProgram.Instructions.Add(OpSourceRegImm(iStatement))
+            Case "ANDN", "ORN", "XNOR", "SH1ADD", "SH2ADD", "SH3ADD", "ADC", "SBC" "SUB", "ZEXTB", "ZEXTH", "SEXTB", "SEXTH", "TESTN", "MOVLT", "MOVLE", "MOVGT", "MOVGE", "MOVLTU", "MOVLEU", "MOVGTU", "MOVGEU", "MOVS", "MOVNS", "MOVO", "MOVNO"
+              vProgram.Instructions.Add(OpSourceReg(iStatement))
             Case "SH1", "SH2", "SH3", "SRA", "SRL"
+              vProgram.Instructions.Add(OpDestOnly(iStatement))
             Case "ENTER", "ENTERL", "EXIT", "EXITL"
               vProgram.Instructions.Add(EnterExit(iStatement))
             Case "NOP", "RET", "LINK"
@@ -64,17 +149,112 @@ Public Function Parse(StatementList As Statement[]) As Program
     End Select
   Next
 End 
+
+Private Function MovOp(StatementA As Statement) As Instruction
   
-Private Function OpSourceReg(StatementA As Statement) As Instruction
+  Dim Valid As Boolean = False
+  
+  Dim Dest As Argument
+  Dim Source As Argument
   
   Dim Tokens As Token[] = StatementA.Tokens
   
-  If Tokens[1].Type <> Token.TYPE_REGISTER Or If Tokens[2].Word <> "," Or If Tokens[3].Type <> Token.TYPE_REGISTER Then Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  If Tokens.Length <> 4 Or If Tokens[1].Type <> Token.TYPE_REGISTER Or If Tokens[2].Word <> "," Then Error.Raise("Invalid syntax for " & Tokens[0].Word)
   
-  Dim RegDest As Argument = New ArgRegister(Utility.StrInList(Tokens[1].Word))
-  Dim RegSource As Argument = New ArgRegister(Utility.StrInList(Tokens[3].Word))
+  Dim DestIndex As Integer = Utility.StrInList(Tokens[1].Word, Keywords.REGISTERS)
+  Dim SourceIndex As Integer
   
-  Return Instruction.Build(StatementA.Address, Tokens[0].Word, RegDest, RegSource)
+  If DestIndex = 20 Then 
+    Dest = New ArgLinkRegister
+  Else If DestIndex >= 16 Then 
+    Dest = New ArgPtrRegister(DestIndex)
+  Else 
+    Valid = True
+    Dest = New ArgRegister(DestIndex)
+  Endif
+  
+  Select Case Tokens[3].Type
+    Case Token.TYPE_REGISTER
+      SourceIndex = Utility.StrInList(Tokens[3].Word, Keywords.REGISTERS)
+      If SourceIndex = 20 Then 
+        Source = New ArgLinkRegister
+      Else If SourceIndex >= 16 Then 
+        Source = New ArgPtrRegister(SourceIndex)
+      Else 
+        Valid = True
+        Source = New ArgRegister(SourceIndex)
+      Endif
+    Case Token.TYPE_NUMERIC
+      Source = New ArgNumeric(Tokens[3].Word)
+    Case Else 
+      Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  End Select
+  
+  If Not Valid Then Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  
+  Return Instruction.Build(StatementA.Address, Tokens[0].Word, Dest, Source)
+  
+End
+
+
+Private Function OpSourceRegImm(StatementA As Statement) As Instruction
+  
+  Dim Dest As Argument
+  Dim Source As Argument
+  
+  Dim Tokens As Token[] = StatementA.Tokens
+  
+  If Tokens.Length <> 4 Or If Tokens[1].Type <> Token.TYPE_REGISTER Or If Tokens[2].Word <> "," Then Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  
+  Try Dest = New ArgRegister(Utility.StrInList(Tokens[1].Word, Keywords.REGISTERS))
+  
+  Select Case Tokens[3].Type
+    Case Token.TYPE_REGISTER
+      Try Source = New ArgRegister(Utility.StrInList(Tokens[3].Word, Keywords.REGISTERS))
+    Case Token.TYPE_NUMERIC
+      Source = New ArgNumeric(Tokens[3].Word)
+    Case Else 
+      Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  End Select
+  
+  If Error Then Error.Raise(Tokens[0].Word & " cannot take special registers as arguments")
+  
+  Return Instruction.Build(StatementA.Address, Tokens[0].Word, Dest, Source)
+  
+End
+  
+Private Function OpSourceReg(StatementA As Statement) As Instruction
+  
+  Dim Dest As Argument
+  Dim Source As Argument
+  
+  Dim Tokens As Token[] = StatementA.Tokens
+  
+  If Tokens.Length <> 4 Or If Tokens[1].Type <> Token.TYPE_REGISTER Or If Tokens[2].Word <> "," Or If Tokens[3].Type <> Token.TYPE_REGISTER Then Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  
+  Try Dest = New ArgRegister(Utility.StrInList(Tokens[1].Word, Keywords.REGISTERS))
+  Try Source = New ArgRegister(Utility.StrInList(Tokens[3].Word, Keywords.REGISTERS))
+  
+  If Error Then Error.Raise(Tokens[0].Word & " cannot take special registers as arguments")
+  
+  Return Instruction.Build(StatementA.Address, Tokens[0].Word, Dest, Source)
+  
+End
+
+Private Function OpDestOnly(StatementA As Statement) As Instruction
+  
+  Dim Tokens As Token[] = StatementA.Tokens
+  
+  If Tokens.Length <> 2 Or If Tokens[1].Type <> Token.TYPE_REGISTER Then Error.Raise("Invalid syntax for " & Tokens[0].Word)
+  
+  Dim Register As Argument
+  
+  Try Register = New ArgRegister(Utility.StrInList(Tokens[1].Word, Keywords.REGISTERS))
+  
+  If Error Then Error.Raise(Tokens[0].Word & " cannot take a special register as its argument")
+  
+  Return Instruction.Build(StatementA.Address, Tokens[0].Word, Register)
+  
 End
 
   

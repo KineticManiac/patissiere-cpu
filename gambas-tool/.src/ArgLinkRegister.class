@@ -1,0 +1,9 @@
+' Gambas class file
+
+Inherits Argument
+
+Public Sub _new()
+  
+  Me.Type = Argument.TYPE_LINK_REGISTER
+  
+End

@@ -35,6 +35,8 @@ Public OPCODES As String[] = [
   "SH1ADD",
   "SH2ADD",
   "SH3ADD",
+  "ADC",
+  "SBC",
   "SUB",
   "ROL",
   "ROR",

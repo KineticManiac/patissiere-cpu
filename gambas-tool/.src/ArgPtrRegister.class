@@ -1,0 +1,14 @@
+' Gambas class file
+
+Inherits Argument
+
+Public Index As Integer
+
+Public Sub _new(Index As Integer)
+  
+  Me.Type = Argument.TYPE_PTR_REGISTER
+  Me.Index = Index - 16
+  
+  If index < 16 Or If index > 19 Then Error.Raise("ArgPtrRegister class must refer to pointer registers")
+  
+End
